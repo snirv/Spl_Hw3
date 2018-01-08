@@ -9,7 +9,7 @@ public class UserMovieRental extends User{
 
     private String country;
     private long balance;
-    private List<Movie> movies;
+    private  List<Movie> movies;
 
 
 
