@@ -2,6 +2,7 @@ package bgu.spl181.net.api.bidi;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -9,41 +10,53 @@ public abstract class SharedData {
 
     protected  ConcurrentHashMap<String ,User> mapOfRegisteredUsersByUsername;// map userName to User
     protected  ConcurrentHashMap<Integer,User> mapOfLoggedInUsersByConnectedIds; // map connectionId to username
-
+    private Object LogInLock;
+    private Object registerLock;
 
     public SharedData() {
         this.mapOfLoggedInUsersByConnectedIds = null;
         this.mapOfRegisteredUsersByUsername = null;
+        this.registerLock = new Object();
+        this.LogInLock = new Object();
     }
 
     public SharedData(ConcurrentHashMap<String, User> userMap) {
         this.mapOfLoggedInUsersByConnectedIds = new ConcurrentHashMap<>();
         this.mapOfRegisteredUsersByUsername = userMap;
+        this.registerLock = new Object();
+        this.LogInLock = new Object();
+
     }
 
     protected  String commandRegister(String username , String password ,String dataBlock , Integer connectionId){
+        synchronized (registerLock) {
         if (mapOfLoggedInUsersByConnectedIds.contains(connectionId) ||
                 mapOfRegisteredUsersByUsername.contains(username) ||
                 !isValidDataBlock(dataBlock)  ){
             return "ERROR registration failed";
         }
-        addUser(username,password,connectionId, dataBlock);
-        updateUserJson();
-        updateServiceJson();
-        return "ACK registration succeeded";
+            addUser(username, password, connectionId, dataBlock);
+            updateUserJson();
+            updateServiceJson();
+            return "ACK registration succeeded";
+        }
 
     }
     protected  String commandLogIn(String username , String password  ,Integer connectionId){
-        if(!mapOfRegisteredUsersByUsername.contains(username) ||
-                mapOfLoggedInUsersByConnectedIds.contains(connectionId) ||
-                mapOfRegisteredUsersByUsername.get(username).isLoggedIn){
-            return "ERROR login failed";
+        synchronized (LogInLock) {
+            if (!mapOfRegisteredUsersByUsername.contains(username) ||
+                    mapOfLoggedInUsersByConnectedIds.contains(connectionId) ||
+                    mapOfRegisteredUsersByUsername.get(username).isLoggedIn) {
+                return "ERROR login failed";
+            }
+            User user = mapOfRegisteredUsersByUsername.get(username);
+            if (!user.getPassword().equals(password)) {
+                return "ERROR login failed";
+            }
+            user.setLoggedIn(true);
+            mapOfLoggedInUsersByConnectedIds.put(connectionId, user);
+            return "ACK login succeeded";
         }
-        User user = mapOfRegisteredUsersByUsername.get(username);//TODO need to sync
-        if(!user.getPassword().equals(password)){ return "ERROR login failed";}
-        user.setLoggedIn(true);
-        mapOfLoggedInUsersByConnectedIds.put(connectionId , user);
-        return "ACK login succeeded";
     }
     protected  String commandSignOut(Integer connctionId){
         if(!mapOfLoggedInUsersByConnectedIds.contains(connctionId)){

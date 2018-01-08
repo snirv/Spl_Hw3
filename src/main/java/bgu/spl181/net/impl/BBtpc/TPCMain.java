@@ -1,6 +1,8 @@
 package bgu.spl181.net.impl.BBtpc;
 
+import bgu.spl181.net.api.MessageEncoderDecoderImpl;
 import bgu.spl181.net.api.bidi.*;
+import bgu.spl181.net.srv.Server;
 import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
@@ -8,24 +10,25 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TPCMain {
     public static void main(String[] args) {
-
-        /*Server tpcServer = Server.threadPerClient(
+        MovieSharedData movieSharedData = ReadFromJson();
+        Server tpcServer = Server.threadPerClient(
                 Integer.decode(args[0]).intValue(),
-                ()-> new MovieRentalProtocol(new MovieSharedData(null,null)),
+                ()-> new MovieRentalProtocol(movieSharedData),
                 ()-> new MessageEncoderDecoderImpl<>()
         );
-        tpcServer.serve();*/
+        tpcServer.serve();
 
-
-        testReadFromJson();
-        testWriteToJson();
+        //testWriteToJson();
 
     }
 
-    public static void testReadFromJson(){
+
+
+    public static MovieSharedData ReadFromJson() {
         JsonUsers jsonUsers;
         JsonMovies jsonMovies;
         Gson gson = new Gson();
@@ -34,30 +37,20 @@ public class TPCMain {
             FileReader movieSReader = new FileReader("Database/Movies.json");
             jsonUsers = gson.fromJson(userReader, JsonUsers.class);
             jsonMovies = gson.fromJson(movieSReader, JsonMovies.class);
-            System.out.println(jsonUsers);
-            System.out.println(jsonMovies);
-        } catch (FileNotFoundException ex) {
 
-        }
-
-
-   /*     MovieSharedData jsonUsers;
-        Gson gson = new Gson();
-        try {
-            FileReader fileReader = new FileReader("Database/Users.json");
-            jsonUsers = gson.fromJson(fileReader, MovieSharedData.class);
-            System.out.println(jsonUsers);
-        } catch (FileNotFoundException ex) {
-
-        }*/
-    /*    ConcurrentHashMap<Integer,Movie> moviesMap;//TODO delete
-        List<Movie> movieList;
-        protected  ConcurrentHashMap<String ,User> mapOfRegisteredUsersByUsername;
-        protected  ConcurrentHashMap<Integer,User> mapOfLoggedInUsersByConnectedIds;*/
-
-
-
+            CopyOnWriteArrayList<UserMovieRental> usersList = jsonUsers.getUsers();
+            CopyOnWriteArrayList<Movie> moviesList = jsonMovies.getMovies();
+            ConcurrentHashMap usersMap = new ConcurrentHashMap();
+            for (UserMovieRental user : usersList) {
+                usersMap.put(user.getUserName(), user);
+            }
+            MovieSharedData movieSharedData = new MovieSharedData(usersMap, moviesList);
+            return movieSharedData;
+        } catch (FileNotFoundException ex) {}
+        return null;
     }
+
+
 
 
 
@@ -75,7 +68,7 @@ public class TPCMain {
         Movie m2 = new Movie(2,"titanic2",51, new LinkedList<>(), 4);
         Movie m3 = new Movie(3,"titanic3",52, new LinkedList<>(), 7);
 
-        MovieSharedData movieSharedData = new MovieSharedData(new ConcurrentHashMap<>(), new  ConcurrentHashMap<>());
+        MovieSharedData movieSharedData = new MovieSharedData(new ConcurrentHashMap<>(), new CopyOnWriteArrayList<>());
         movieSharedData.getMovieList().add(m1);
         movieSharedData.getMovieList().add(m2);
         movieSharedData.getMovieList().add(m3);
