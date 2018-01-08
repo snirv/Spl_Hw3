@@ -1,5 +1,7 @@
 package bgu.spl181.net.api.bidi;
 
+import java.util.ArrayList;
+
 public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProtocol<T> {
 
     protected int connectionId;
@@ -24,44 +26,20 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
         String result;
         if (message instanceof String) {
             String[] msg = ((String) message).split(" ");
-                switch (msg[0]) {//assume wont be nullpointer exception
+                switch (msg[0]) {
                     case "REGISTER":
-
-                        if (msg.length == 3) {
-                            result = sharedData.commandRegister(msg[1], msg[2], null, connectionId);
-                            connections.send(connectionId, (T) result);
-                        } else if (msg.length == 4) {
-                            result = sharedData.commandRegister(msg[1], msg[2], msg[3], connectionId);
-                            connections.send(connectionId, (T) result);
-                        } else {
-                            connections.send(connectionId, (T) "ERROR registration failed");
-                        }
+                        register(msg);
                         break;
                     case "LOGIN":
-                        if (msg.length == 3) {
-                            result = sharedData.commandLogIn(msg[1], msg[2],connectionId);
-                            connections.send(connectionId, (T) result);
-                        } else {
-                            connections.send(connectionId, (T) "ERROR login failed");
-                        }
+                       login(msg);
                         break;
                     case "SIGNOUT":
-                        result = sharedData.commandSignOut(connectionId);
-                        if(result.equals("ACK signout succeeded")){
-                            shouldTerminated=true;
-                            connections.disconnect(connectionId);
-                            connections.send(connectionId,(T)result);
-                        }
-                        else {
-                            connections.send(connectionId,(T)result);
-                        }
+                        signout();
                         break;
-
                     case "REQUEST":
                         String requestArgs = ((String) message).substring(((String) message).indexOf(" ")+1);
                         parseringRequest(requestArgs);
                         break;
-
                     default:
                         break;
 
@@ -84,6 +62,50 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
 
 
         public abstract void parseringRequest(String args);
+
+        public void register (String[] msg){
+            String result;
+            if (msg.length == 3) {
+                result = sharedData.commandRegister(msg[1], msg[2], null, connectionId);
+                connections.send(connectionId, (T) result);
+            } else if (msg.length > 3) {
+                String datablock="";
+                for (int i=3; i<msg.length;i++){
+                    datablock= datablock + msg[i]+" ";
+                }
+                datablock=datablock.substring(0,datablock.length()-1);
+                result = sharedData.commandRegister(msg[1], msg[2], datablock, connectionId);
+                connections.send(connectionId, (T) result);
+            }else {
+                connections.send(connectionId, (T) "ERROR registration failed");
+            }
+        }
+
+
+        public void  login (String[] msg){
+            String result;
+            if (msg.length == 3) {
+                result = sharedData.commandLogIn(msg[1], msg[2],connectionId);
+                connections.send(connectionId, (T) result);
+            } else {
+                connections.send(connectionId, (T) "ERROR login failed");
+            }
+        }
+
+
+        public void signout() {
+        String result = sharedData.commandSignOut(connectionId);
+        if(result.equals("ACK signout succeeded")){
+            shouldTerminated=true;
+            connections.disconnect(connectionId);
+            connections.send(connectionId,(T)result);
+        }
+        else {
+            connections.send(connectionId,(T)result);
+        }
+
+    }
+
     }
 
 

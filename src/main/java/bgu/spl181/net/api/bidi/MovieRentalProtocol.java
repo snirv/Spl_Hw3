@@ -28,13 +28,8 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
                 connections.send(connectionId, "ERROR request" + msg[0]+" "+msg[1] + "failed"); }
         }
         else {
-            String argument="";
-            for (int i=1; i<msg.length;i++){
-                argument=argument+msg[i]+" ";
-            }
-            argument.substring(0,argument.length()-1);
-
-            switch (msg[0]) {//assume wont be nullpointer exception
+            String argument=args.substring(args.indexOf(" ")+1);
+            switch (msg[0]) {
                 case "balance":
                     if(msg[1].equals("info")){
                         result= movieSharedData.commandRequestBalanceInfo(connectionId);
