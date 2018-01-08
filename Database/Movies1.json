@@ -1,3 +1,1 @@
-{"movies":[{"id":"1","name":"titanic","price":"50",
-  "bannedCountries":["israel","israel2","israel3"],
-  "availableAmount":"5","totalAmount":"5"},{"id":"2","name":"titanic2","price":"51","bannedCountries":[],"availableAmount":"4","totalAmount":"4"},{"id":"3","name":"titanic3","price":"52","bannedCountries":[],"availableAmount":"7","totalAmount":"7"}]}
+{"movies":[{"id":"1","name":"titanic","price":"50","bannedCountries":["israel","israel2","israel3"],"availableAmount":"5","totalAmount":"5"},{"id":"2","name":"titanic2","price":"51","bannedCountries":[],"availableAmount":"4","totalAmount":"4"},{"id":"3","name":"titanic3","price":"52","bannedCountries":[],"availableAmount":"7","totalAmount":"7"}]}
