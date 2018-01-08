@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class JsonUsers {
 
@@ -13,19 +14,19 @@ public class JsonUsers {
      */
 
 
-    public ArrayList<UserMovieRental> users;
+    public CopyOnWriteArrayList<UserMovieRental> users;
 
 
 
 
-    public void setUsers(ArrayList<UserMovieRental> users) {
+    public void setUsers(CopyOnWriteArrayList<UserMovieRental> users) {
         this.users = users;
     }
 
 
 
 
-    public ArrayList<UserMovieRental> getUsers() {
+    public CopyOnWriteArrayList<UserMovieRental> getUsers() {
             return users;
         }
 

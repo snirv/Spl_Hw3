@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class JsonMovies {
 
@@ -13,14 +14,14 @@ public class JsonMovies {
      */
 
 
-    public ArrayList<Movie> movies;
+    public CopyOnWriteArrayList<Movie> movies;
 
 
-    public ArrayList<Movie> getMovies() {
+    public CopyOnWriteArrayList<Movie> getMovies() {
         return movies;
     }
 
-    public void setMovies(ArrayList<Movie> movies) {
+    public void setMovies(CopyOnWriteArrayList<Movie> movies) {
         this.movies = movies;
     }
 

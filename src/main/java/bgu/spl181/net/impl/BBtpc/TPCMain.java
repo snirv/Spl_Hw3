@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TPCMain {
     public static void main(String[] args) {
@@ -37,8 +38,8 @@ public class TPCMain {
             jsonUsers = gson.fromJson(userReader, JsonUsers.class);
             jsonMovies = gson.fromJson(movieSReader, JsonMovies.class);
 
-            ArrayList<UserMovieRental> usersList = jsonUsers.getUsers();
-            ArrayList<Movie> moviesList = jsonMovies.getMovies();
+            CopyOnWriteArrayList<UserMovieRental> usersList = jsonUsers.getUsers();
+            CopyOnWriteArrayList<Movie> moviesList = jsonMovies.getMovies();
             ConcurrentHashMap usersMap = new ConcurrentHashMap();
             for (UserMovieRental user : usersList) {
                 usersMap.put(user.getUserName(), user);
@@ -67,7 +68,7 @@ public class TPCMain {
         Movie m2 = new Movie(2,"titanic2",51, new LinkedList<>(), 4);
         Movie m3 = new Movie(3,"titanic3",52, new LinkedList<>(), 7);
 
-        MovieSharedData movieSharedData = new MovieSharedData(new ConcurrentHashMap<>(), new LinkedList<>());
+        MovieSharedData movieSharedData = new MovieSharedData(new ConcurrentHashMap<>(), new CopyOnWriteArrayList<>());
         movieSharedData.getMovieList().add(m1);
         movieSharedData.getMovieList().add(m2);
         movieSharedData.getMovieList().add(m3);
