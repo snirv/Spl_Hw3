@@ -15,23 +15,17 @@ public class JsonUsers {
 
     public ArrayList<UserMovieRental> users;
 
-    public ArrayList<Movie> movies;
+
 
 
     public void setUsers(ArrayList<UserMovieRental> users) {
         this.users = users;
     }
 
-    public ArrayList<Movie> getMovies() {
-        return movies;
-    }
-
-    public void setMovies(ArrayList<Movie> movies) {
-        this.movies = movies;
-    }
 
 
-    public List getUsers() {
+
+    public ArrayList<UserMovieRental> getUsers() {
             return users;
         }
 

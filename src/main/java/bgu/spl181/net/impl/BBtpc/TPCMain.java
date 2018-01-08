@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,14 +26,16 @@ public class TPCMain {
     }
 
     public static void testReadFromJson(){
-          JsonUsers jsonUsers;
+        JsonUsers jsonUsers;
+        JsonMovies jsonMovies;
         Gson gson = new Gson();
         try {
             FileReader userReader = new FileReader("Database/Users.json");
             FileReader movieSReader = new FileReader("Database/Movies.json");
             jsonUsers = gson.fromJson(userReader, JsonUsers.class);
-            jsonUsers = gson.fromJson(movieSReader, JsonUsers.class);
+            jsonMovies = gson.fromJson(movieSReader, JsonMovies.class);
             System.out.println(jsonUsers);
+            System.out.println(jsonMovies);
         } catch (FileNotFoundException ex) {
 
         }

@@ -27,13 +27,18 @@ public class Movie implements Serializable{
 
     @Override
     public String toString() {
-        String bannedCountries ="";
-        for (String country : this.bannedCountries){
-            bannedCountries = country + " ";
+        if(bannedCountries != null && !bannedCountries.isEmpty()) {
+            String bannedCountries = "";
+            for (String country : this.bannedCountries) {
+                bannedCountries = country + " ";
+            }
+            bannedCountries = bannedCountries.substring(0, bannedCountries.length() - 1);
+            return name + " " + availableAmount + " " + price + " " + bannedCountries;
         }
-        bannedCountries = bannedCountries.substring(0, bannedCountries.length() -1);
-        return name + " " + availableAmount + " " + price + " " + bannedCountries ;
-    }
+        else {return name + " " + availableAmount + " " + price;}
+
+        }
+
     public long getId() {
         return id;
     }
