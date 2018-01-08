@@ -30,8 +30,8 @@ public abstract class SharedData {
 
     protected  String commandRegister(String username , String password ,String dataBlock , Integer connectionId){
         synchronized (registerLock) {
-        if (mapOfLoggedInUsersByConnectedIds.contains(connectionId) ||
-                mapOfRegisteredUsersByUsername.contains(username) ||
+        if (mapOfLoggedInUsersByConnectedIds.containsKey(connectionId) ||
+                mapOfRegisteredUsersByUsername.containsKey(username) ||
                 !isValidDataBlock(dataBlock)  ){
             return "ERROR registration failed";
         }
@@ -44,8 +44,8 @@ public abstract class SharedData {
     }
     protected  String commandLogIn(String username , String password  ,Integer connectionId){
         synchronized (LogInLock) {
-            if (!mapOfRegisteredUsersByUsername.contains(username) ||
-                    mapOfLoggedInUsersByConnectedIds.contains(connectionId) ||
+            if (!mapOfRegisteredUsersByUsername.containsKey(username) ||
+                    mapOfLoggedInUsersByConnectedIds.containsKey(connectionId) ||
                     mapOfRegisteredUsersByUsername.get(username).isLoggedIn) {
                 return "ERROR login failed";
             }
@@ -59,7 +59,7 @@ public abstract class SharedData {
         }
     }
     protected  String commandSignOut(Integer connctionId){
-        if(!mapOfLoggedInUsersByConnectedIds.contains(connctionId)){
+        if(!mapOfLoggedInUsersByConnectedIds.containsKey(connctionId)){
             return "ERROR signout failed";
         }
         User user = mapOfLoggedInUsersByConnectedIds.remove(connctionId);

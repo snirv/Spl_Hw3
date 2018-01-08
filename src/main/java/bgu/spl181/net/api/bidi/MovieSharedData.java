@@ -25,11 +25,13 @@ public class MovieSharedData extends SharedData{
         super(userMovieRentalMap);
         this.movieList = movieList;
         this.lock = new Object();
+        this.lockUpdateUserJson = new Object();
+        this.lockUpdateServiceJson = new Object();
 
     }
 
     protected boolean isLoggedIn(Integer connectionId){
-        if (mapOfLoggedInUsersByConnectedIds.contains(connectionId)) {
+        if (mapOfLoggedInUsersByConnectedIds.containsKey(connectionId)) {
             return true;
         }
         else {return false;}

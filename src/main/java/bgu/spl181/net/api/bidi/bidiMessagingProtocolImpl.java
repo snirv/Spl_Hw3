@@ -23,7 +23,6 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
 
     @Override
     public void process(T message) {
-        String result;
         if (message instanceof String) {
             String[] msg = ((String) message).split(" ");
                 switch (msg[0]) {
@@ -41,6 +40,7 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
                         parseringRequest(requestArgs);
                         break;
                     default:
+                        connections.send(connectionId,(T)"ERROR unknown command");
                         break;
 
                 }
