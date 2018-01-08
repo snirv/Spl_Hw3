@@ -1,12 +1,20 @@
 package bgu.spl181.net.api.bidi;
 
+
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class SharedData {
 
     protected  ConcurrentHashMap<String ,User> mapOfRegisteredUsersByUsername;// map userName to User
     protected  ConcurrentHashMap<Integer,User> mapOfLoggedInUsersByConnectedIds; // map connectionId to username
 
+
+    public SharedData() {
+        this.mapOfLoggedInUsersByConnectedIds = null;
+        this.mapOfRegisteredUsersByUsername = null;
+    }
 
     public SharedData(ConcurrentHashMap<String, User> userMap) {
         this.mapOfLoggedInUsersByConnectedIds = new ConcurrentHashMap<>();
@@ -20,6 +28,8 @@ public abstract class SharedData {
             return "ERROR registration failed";
         }
         addUser(username,password,connectionId, dataBlock);
+        updateUserJson();
+        updateServiceJson();
         return "ACK registration succeeded";
 
     }
@@ -29,7 +39,7 @@ public abstract class SharedData {
                 mapOfRegisteredUsersByUsername.get(username).isLoggedIn){
             return "ERROR login failed";
         }
-        User user = mapOfRegisteredUsersByUsername.get(username);
+        User user = mapOfRegisteredUsersByUsername.get(username);//TODO need to sync
         if(!user.getPassword().equals(password)){ return "ERROR login failed";}
         user.setLoggedIn(true);
         mapOfLoggedInUsersByConnectedIds.put(connectionId , user);
@@ -61,4 +71,6 @@ public abstract class SharedData {
     public ConcurrentHashMap<Integer,User> getMapOfLoggedInUsersByConnectedIds() {
         return mapOfLoggedInUsersByConnectedIds;
     }
+    protected abstract void updateUserJson();
+    protected abstract void updateServiceJson();
 }

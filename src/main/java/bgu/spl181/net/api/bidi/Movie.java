@@ -1,27 +1,28 @@
 package bgu.spl181.net.api.bidi;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 //I am snir
-public class Movie {
-    protected Integer id;
+public class Movie implements Serializable{
+    protected long id;
     protected String name;
-    protected Integer price;
+    protected long price;
     protected List<String> bannedCountries;
-    protected AtomicInteger availableAmount;
-    protected AtomicInteger totalAmount;
-    protected AtomicBoolean lock;
+    protected  long availableAmount;//TODO need to write the int into String to json
+    protected  long totalAmount;//TODO need to write the int into String to json
+    protected transient AtomicBoolean lock;
 
-    public Movie(Integer id, String name, Integer price, List<String> bannedCountries, int totalAmount) {
+    public Movie(long id, String name, Integer price, List<String> bannedCountries, int totalAmount) {
         this.id = id;
         this.name = name;
         this.price = price;
+        this.availableAmount = totalAmount;
+        this.totalAmount =totalAmount;
         this.bannedCountries = bannedCountries;
-        this.availableAmount.set(totalAmount);
-        this.totalAmount.set(totalAmount);
-        this.lock.set(false);
+        this.lock = new AtomicBoolean(false);
     }
 
     @Override
@@ -33,11 +34,11 @@ public class Movie {
         bannedCountries = bannedCountries.substring(0, bannedCountries.length() -1);
         return name + " " + availableAmount + " " + price + " " + bannedCountries ;
     }
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -49,7 +50,7 @@ public class Movie {
         this.name = name;
     }
 
-    public Integer getPrice() {
+    public long getPrice() {
         return price;
     }
 
@@ -65,19 +66,19 @@ public class Movie {
         this.bannedCountries = bannedCountries;
     }
 
-    public AtomicInteger getAvailableAmount() {
+    public long getAvailableAmount() {
         return availableAmount;
     }
 
-    public void setAvailableAmount(int availableAmount) {
-        this.availableAmount.set( availableAmount);
+    public void setAvailableAmount(long availableAmount) {
+        this.availableAmount = availableAmount;
     }
 
-    public AtomicInteger getTotalAmount() {
+    public long getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(AtomicInteger totalAmount) {
+    public void setTotalAmount(long totalAmount) {
         this.totalAmount = totalAmount;
     }
 }

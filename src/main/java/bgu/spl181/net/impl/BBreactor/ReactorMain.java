@@ -9,13 +9,13 @@ public class ReactorMain {
 
     public static void main(String[] args){
        /*int numOfThreads = *///TODO
-       Server reactorServer = Server.reactor(
+       /*Server reactorServer = Server.reactor(
                 3,
                 Integer.decode(args[0]).intValue(),
                 ()-> new bidiMessagingProtocolImpl<>(),
                 ()-> new MessageEncoderDecoderImpl<>()
         );
-       reactorServer.serve();
+       reactorServer.serve();*/
     }
 
 

@@ -1,18 +1,19 @@
 package bgu.spl181.net.api.bidi;
 
-public abstract class User {
+import java.io.Serializable;
+
+public  class User implements Serializable {
     //I am sharon
-    protected String userName;
+    protected String username;
     protected String password;
     protected String type;
+    protected transient boolean isLoggedIn;
+    protected transient int connectionId;//TODO check if necessary
 
 
-    protected boolean isLoggedIn;
-    protected int connectionId;//TODO check if necessary
 
-
-    public User(String userName, String password, String type ,int connectionId) {
-        this.userName = userName;
+    public User(String username, String password, String type ,int connectionId) {
+        this.username = username;
         this.password = password;
         this.type = type;
         isLoggedIn = false;
@@ -20,11 +21,11 @@ public abstract class User {
     }
 
     public String getUserName() {
-        return userName;
+        return username;
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.username = userName;
     }
 
     public String getPassword() {

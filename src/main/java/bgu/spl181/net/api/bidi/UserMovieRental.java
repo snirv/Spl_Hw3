@@ -3,18 +3,22 @@ package bgu.spl181.net.api.bidi;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class UserMovieRental extends User{
 
     private String country;
-    private int balance;
-    private List<Movie> moviesList;
+    private long balance;
+    private List<Movie> movies;
+
+
 
     public UserMovieRental(String userName, String password, String type , int connectionId, String country, int balance, List<Movie> moviesList) { //TODO connection id where to initiate
         super(userName, password, type , connectionId);
         this.country = country;
         this.balance = balance;
-        this.moviesList = moviesList;
+        this.movies = moviesList;
+
     }
 
     public String getCountry() {
@@ -25,23 +29,23 @@ public class UserMovieRental extends User{
         this.country = country;
     }
 
-    public int getBalance() {
+    public long getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(long balance) {
         this.balance = balance;
     }
 
     public List<Movie> getMoviesList() {
-        return moviesList;
+        return movies;
     }
 
     public void setMoviesList(List<Movie> moviesList) {
-        this.moviesList = moviesList;
+        this.movies = moviesList;
     }
 
-    protected int addBalance(int balanceToAdd){
+    protected long addBalance(long balanceToAdd){
         return balance + balanceToAdd;
 
     }
@@ -54,7 +58,7 @@ public class UserMovieRental extends User{
     }
 
     public boolean isRentingMovie(String movieName){
-        Optional<Movie> movieOptional = moviesList.stream().filter((m)-> m.getName().equals(movieName)).findAny();
+        Optional<Movie> movieOptional = movies.stream().filter((m)-> m.getName().equals(movieName)).findAny();
         if(movieOptional.isPresent()){
             return true;
         }

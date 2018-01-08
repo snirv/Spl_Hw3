@@ -42,7 +42,7 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
 
                     }
                     else if (msg[1].equals("add")){
-                        result=movieSharedData.commandRequestBalanceAdd(connectionId,Integer.decode(msg[2]));
+                        result=movieSharedData.commandRequestBalanceAdd(connectionId,msg[2]);
                         connections.send(connectionId,result);
 
                     }
