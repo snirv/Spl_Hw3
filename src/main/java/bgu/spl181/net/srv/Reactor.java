@@ -24,7 +24,7 @@ public class Reactor<T> implements Server<T> {
     private final ActorThreadPool pool;
     private Selector selector;
     private Connections<T> connections;
-    private AtomicInteger counter = new AtomicInteger(0);
+    private AtomicInteger connectionIdcounter = new AtomicInteger(0);
     private Thread selectorThread;
     private final ConcurrentLinkedQueue<Runnable> selectorTasks = new ConcurrentLinkedQueue<>();
 
@@ -102,13 +102,13 @@ public class Reactor<T> implements Server<T> {
         SocketChannel clientChan = serverChan.accept();
         clientChan.configureBlocking(false);
         bidiMessagingProtocol protocol = protocolFactory.get();
-        protocol.start(counter.incrementAndGet(),connections);
+        protocol.start(connectionIdcounter.incrementAndGet(),connections);
         final NonBlockingConnectionHandler handler = new NonBlockingConnectionHandler(
                 readerFactory.get(),
                 protocol,
                 clientChan,
                 this);
-        ((ConnectionsImpl<T>)connections).getClients().put(counter.intValue(),handler);
+        ((ConnectionsImpl<T>)connections).getClients().put(connectionIdcounter.intValue(),handler);
         clientChan.register(selector, SelectionKey.OP_READ, handler);
     }
 
