@@ -6,9 +6,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 //I am snir
-public class Movie implements Serializable{
-    protected long id;
-    protected String name;
+public class Movie extends  BaseMovie{
+
     protected long price;
     protected List<String> bannedCountries;
     protected  long availableAmount;//TODO need to write the int into String to json
@@ -16,8 +15,7 @@ public class Movie implements Serializable{
     protected transient AtomicBoolean lock;
 
     public Movie(long id, String name, Integer price, List<String> bannedCountries, int totalAmount) {
-        this.id = id;
-        this.name = name;
+        super(id ,name);
         this.price = price;
         this.availableAmount = totalAmount;
         this.totalAmount =totalAmount;
@@ -39,21 +37,6 @@ public class Movie implements Serializable{
 
         }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public long getPrice() {
         return price;

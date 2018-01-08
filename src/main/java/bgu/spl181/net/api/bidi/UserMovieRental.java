@@ -9,11 +9,11 @@ public class UserMovieRental extends User{
 
     private String country;
     private long balance;
-    private  List<Movie> movies;
+    private  List<BaseMovie> movies;
 
 
 
-    public UserMovieRental(String userName, String password, String type , int connectionId, String country, int balance, List<Movie> moviesList) { //TODO connection id where to initiate
+    public UserMovieRental(String userName, String password, String type , int connectionId, String country, int balance, List<BaseMovie> moviesList) { //TODO connection id where to initiate
         super(userName, password, type , connectionId);
         this.country = country;
         this.balance = balance;
@@ -37,11 +37,11 @@ public class UserMovieRental extends User{
         this.balance = balance;
     }
 
-    public List<Movie> getMoviesList() {
+    public List<BaseMovie> getMoviesList() {
         return movies;
     }
 
-    public void setMoviesList(List<Movie> moviesList) {
+    public void setMoviesList(List<BaseMovie> moviesList) {
         this.movies = moviesList;
     }
 
@@ -58,7 +58,7 @@ public class UserMovieRental extends User{
     }
 
     public boolean isRentingMovie(String movieName){
-        Optional<Movie> movieOptional = movies.stream().filter((m)-> m.getName().equals(movieName)).findAny();
+        Optional<BaseMovie> movieOptional = movies.stream().filter((m)-> m.getName().equals(movieName)).findAny();
         if(movieOptional.isPresent()){
             return true;
         }
