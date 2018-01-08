@@ -10,6 +10,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     protected ConcurrentHashMap<Integer,ConnectionHandler<T>> clients;
 
+    public ConnectionsImpl() {
+        this.clients = new ConcurrentHashMap<>();
+    }
 
     @Override
     public boolean send(int connectionId, T msg) {
