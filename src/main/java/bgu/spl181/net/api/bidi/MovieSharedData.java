@@ -14,15 +14,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MovieSharedData extends SharedData{
 
-    ConcurrentHashMap<Integer,Movie> moviesMap;//TODO delete
     List<Movie> movieList;
-    protected List<UserMovieRental> users;//TODO for json?
 
-    public MovieSharedData(ConcurrentHashMap<String, User> userMovieRentalMap ,ConcurrentHashMap<Integer,Movie> moviesMap) {
+    public MovieSharedData(ConcurrentHashMap<String,User> userMovieRentalMap ,List<Movie> movieList) {
         super(userMovieRentalMap);
-        this.moviesMap = moviesMap;
-        this.movieList = new CopyOnWriteArrayList<>();
-        this.users = new CopyOnWriteArrayList<>();
+        this.movieList = movieList;
+
     }
 
     protected boolean isLoggedIn(Integer connectionId){
