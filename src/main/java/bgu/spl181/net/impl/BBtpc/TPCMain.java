@@ -7,13 +7,16 @@ import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
+import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TPCMain {
     public static void main(String[] args) {
+        try {
+            System.out.println(InetAddress.getLocalHost());
+        }catch (Exception e){}
         MovieSharedData movieSharedData = ReadFromJson();
         Server tpcServer = Server.threadPerClient(
                 Integer.decode(args[0]).intValue(),
