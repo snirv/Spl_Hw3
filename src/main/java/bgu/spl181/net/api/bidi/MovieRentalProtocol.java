@@ -22,10 +22,7 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
             connections.send(connectionId,"ERROR request failed");
             return;
         } else if(!movieSharedData.isLoggedIn(connectionId)) {
-            if ((!msg[0].equals("balance")) || (msg[0].equals("balance")&&(!msg[1].equals("add")||!msg[1].equals("info")))) {
-                connections.send(connectionId, "ERROR request" + msg[0] + "failed");
-            } else {
-                connections.send(connectionId, "ERROR request" + msg[0]+" "+msg[1] + "failed"); }
+            connections.send(connectionId, "ERROR request " + msg[0] + " failed");
         }
         else {
             String argument=args.substring(args.indexOf(" ")+1);
@@ -42,97 +39,111 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
 
                     }
                     else {
-                        connections.send(connectionId,"ERROR request" + msg[0] + "failed");
+                        connections.send(connectionId,"ERROR request " + msg[0] + " failed");
                     }
                     break;
                 case "info":
-                    if (msg.length==1 || argument.equals("")){//TODO what if we get an empty string handle """"
+                    if (msg.length==1){//TODO what if we get an empty string handle """"
                         result = movieSharedData.commandRequestMovieInfo(null);
                         connections.send(connectionId,result);
                     }
                     else{
-
+                        argument= argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
                         result = movieSharedData.commandRequestMovieInfo(argument);
                         connections.send(connectionId,result);
                     }
                     break;
                 case  "rent":
+                    argument= argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
                     result=movieSharedData.commandRequestMovieRent(connectionId,argument);
                     connections.send(connectionId,result);
                     if (result.substring(0,3).equals("ACK")){
-                        String broadcastResult= movieSharedData.commandRequestBroad(argument);
+                        Movie movie = movieSharedData.getMovieFromListByMovieName(argument);
+                        String broadcastResult= movieSharedData.commandRequestBroad(movie);
                         broadcast(broadcastResult);
                     }
                     break;
                 case "return":
+                    argument= argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
                     result= movieSharedData.commandRequestReturnMovie(connectionId,argument);
                     connections.send(connectionId,result);
                     if (result.substring(0,3).equals("ACK")){
-                        String broadcastResult= movieSharedData.commandRequestBroad(argument);
+                        Movie movie = movieSharedData.getMovieFromListByMovieName(argument);
+                        String broadcastResult= movieSharedData.commandRequestBroad(movie);
                         broadcast(broadcastResult);
                     }
                     break;
                 case "addmovie":
-                    String movieName= msg[1];
-                    int i=2;
-                    if(movieName.charAt(movieName.length()-1)!='"'){
-                        movieName= movieName+" "+msg[2];
-                        while (i<msg.length || msg[i].charAt(msg[i].length()-1)!= '"'){
-                            i++;
-                            movieName= movieName+" "+msg[i];
-                        }
+                    args= args.substring(args.indexOf(" ")+2);
+                    String movieName=  args.substring(0,args.indexOf("\""));
+                    args= args.substring(args.indexOf("\"")+2);
+                    int amount = Integer.decode(args.substring(0,args.indexOf(" ")));
+                    args= args.substring(args.indexOf(" ")+1);
+                    int price;
+                    if (args.contains(" ")) {
+                         price = Integer.decode(args.substring(0, args.indexOf(" ")));
+                    }else { price = Integer.decode(args);
+
                     }
-                    int amount = Integer.decode(msg[i]);
-                    i++;
-                    int price = Integer.decode(msg[i]);
-                    if (i== msg.length-1){
+                    if(args.indexOf(" ")==-1){
                         result=movieSharedData.commandRequestAdminAddMovie(connectionId,movieName,amount,price,null);
                         connections.send(connectionId,result);
                         if (result.substring(0,3).equals("ACK")){
-                            String broadcastResult= movieSharedData.commandRequestBroad(movieName);//TODO
+                            Movie movie = movieSharedData.getMovieFromListByMovieName(movieName);
+                            String broadcastResult= movieSharedData.commandRequestBroad(movie);//TODO
                             broadcast(broadcastResult);
                         }
                         break;
                     }
                     else{
+                        args= args.substring(args.indexOf(" ")+1);
                         List<String> banned = new LinkedList<>();
-                        while (i<msg.length){
-                            String country=msg[i];
-                            while (i<msg.length-1 && msg[i].charAt(msg[i].length()-1)!='"'){
-                                i++;
-                                country=country+" "+ msg[i];
-                            }
+                        while(args.indexOf("\"")!= -1 ){
+                            args = args.substring(1);
+                            String country = args.substring(0,args.indexOf("\""));
                             banned.add(country);
-                            i++;
+                            args = args.substring(args.indexOf("\""));
+                            if(args.length()>1){
+                                args = args.substring(2);
+                            }else {
+                                args = "";
+                            }
                         }
                         result=movieSharedData.commandRequestAdminAddMovie(connectionId,movieName,amount,price,banned);
                         connections.send(connectionId,result);
                         if (result.substring(0,3).equals("ACK")){
-                            String broadcastResult= movieSharedData.commandRequestBroad(movieName);//TODO
+                            Movie movie = movieSharedData.getMovieFromListByMovieName(movieName);
+                            String broadcastResult= movieSharedData.commandRequestBroad(movie);//TODO
                             broadcast(broadcastResult);
                         }
                         break;
                     }
 
                 case "remmovie":
-                    result=movieSharedData.commandRequestAdminRemmovie(connectionId,argument);
+                    argument= argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
+                    Movie movieToBeRemoved = movieSharedData.getMovieFromListByMovieName(argument);
+                    result = movieSharedData.commandRequestAdminRemmovie(connectionId,argument);
                     connections.send(connectionId,result);
                     if (result.substring(0,3).equals("ACK")){
-                        String broadcastResult= movieSharedData.commandRequestRemoveBroad(argument);//TODO
+                        String broadcastResult = movieSharedData.commandRequestRemoveBroad(movieToBeRemoved);//TODO
                         broadcast(broadcastResult);
                     }
                     break;
                 case "changeprice":
-                    int split= argument.lastIndexOf(" ");
-                    result=movieSharedData.commandRequestAdminChangePrice(connectionId,argument.substring(0,split),Integer.decode(argument.substring(split+1)));
+                    int split = argument.lastIndexOf(" ");
+                    Integer pricetobe= Integer.decode(argument.substring(split+1));
+                    argument = argument.substring(0,split);
+                    String movieNameToSearch = argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
+                    Movie movie = movieSharedData.getMovieFromListByMovieName(movieNameToSearch);
+                    result = movieSharedData.commandRequestAdminChangePrice(connectionId,movieNameToSearch,pricetobe);
                     connections.send(connectionId,result);
                     if (result.substring(0,3).equals("ACK")){
-                        String broadcastResult= movieSharedData.commandRequestBroad(argument.substring(0,split));//TODO
+                        String broadcastResult= movieSharedData.commandRequestBroad(movie);//TODO
                         broadcast(broadcastResult);
                     }
                     break;
                 default:
-                    connections.send(connectionId,"ERROR request" + msg[0] + "failed");
+                    connections.send(connectionId,"ERROR request " + msg[0] + " failed");
                     break;
             }
         }

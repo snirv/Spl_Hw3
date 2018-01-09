@@ -24,6 +24,10 @@ public class UserMovieRental extends User{
     public String getCountry() {
         return country;
     }
+    public String getWithoutQutationCountry() {
+        String ret = country.substring(1,country.length()-1);
+        return ret;
+    }
 
     public void setCountry(String country) {
         this.country = country;

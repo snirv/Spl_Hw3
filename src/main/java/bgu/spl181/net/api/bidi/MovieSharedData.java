@@ -61,10 +61,11 @@ public class MovieSharedData extends SharedData{
 
 
     protected String commandRequestMovieInfo(String movieName) {
-        String ret = "";
+        String ret;
         if(movieName == null){
+            ret = "\"";
             for (Movie movie : movieList){
-                ret = movie.getName() + " ";
+                ret =ret + movie.getName() + "\" \"";//TODO why it doesnt keep the movie name with qoutation??
             }
             ret = ret.substring(0, ret.length() -1);
             return "ACK info " + ret ;
@@ -73,7 +74,7 @@ public class MovieSharedData extends SharedData{
             for (Movie movie : movieList){
                 if(movie.getName().equals(movieName)){
                     ret = movie.toString();
-                    return "ACK info " + ret ;
+                    return "ACK info " + ret  ;
                 }
             }
             return "ERROR request info failed";
@@ -84,7 +85,7 @@ public class MovieSharedData extends SharedData{
         UserMovieRental user = (UserMovieRental) mapOfLoggedInUsersByConnectedIds.get(connectionId);
         Movie movie = getMovieFromListByMovieName(movieName);
         synchronized (lock){
-        if (movie == null || movie.bannedCountries.contains(user.getCountry()) ||
+        if (movie == null || movie.bannedCountries.contains(user.getWithoutQutationCountry()) ||
                 user.isRentingMovie(movieName) ||
                user.getBalance() < movie.getPrice()) {
             return "ERROR request rent failed";
@@ -99,7 +100,7 @@ public class MovieSharedData extends SharedData{
           //  movie.lock.set(false);
             updateUserJson();
             updateServiceJson();
-            return "ACK rent " + movieName + " success";
+            return "ACK rent " +"\"" + movieName + "\"" + " success";
         }
         }
     }
@@ -115,7 +116,7 @@ public class MovieSharedData extends SharedData{
                 movie.setAvailableAmount(movie.getAvailableAmount() + 1);
                 updateUserJson();
                 updateServiceJson();
-                return "ACK return " + movieName + " success";
+                return "ACK return " + "\"" + movieName + "\""+ " success";
             }
         }
     }
@@ -138,7 +139,7 @@ public class MovieSharedData extends SharedData{
                 movieList.add(movieToAdd);
                 updateUserJson();
                 updateServiceJson();
-                return "ACK addmovie " + movieName + " success";
+                return "ACK addmovie " + "\"" + movieName + "\""+ " success";
             }
         }
     }
@@ -157,7 +158,7 @@ public class MovieSharedData extends SharedData{
           //  movie.lock.set(false);
             updateUserJson();
             updateServiceJson();
-            return "ACK remmovie " + movieName + " success";
+            return "ACK remmovie " + "\"" + movieName + "\""+ " success";
         }
     }
 
@@ -165,14 +166,14 @@ public class MovieSharedData extends SharedData{
         synchronized (lock) {
             Movie movie = getMovieFromListByMovieName(movieName);
             if (movie == null || !isAdmin(connectionId) || price <= 0) {
-                return "ERROR request remmovie failed";
+                return "ERROR request changeprice failed";
             }
            // while (!movie.lock.compareAndSet(false, true)) ;
             movie.setPrice(price);
             //movie.lock.set(false);
             updateUserJson();
             updateServiceJson();
-            return "ACK changeprice " + movieName + " success";
+            return "ACK changeprice " + "\"" + movieName + "\"" + " success";
         }
     }
 
@@ -193,7 +194,7 @@ public class MovieSharedData extends SharedData{
 
     }
 
-    private Movie getMovieFromListByMovieName(String movieName) {
+    protected Movie getMovieFromListByMovieName(String movieName) {
         Optional<Movie> movieOptional = movieList.stream().filter((m) -> m.getName().equals(movieName)).findAny();
         if (movieOptional.isPresent()) {
             return movieOptional.get();
@@ -202,14 +203,12 @@ public class MovieSharedData extends SharedData{
         }
     }
 
-    public String commandRequestBroad(String movieName){
-        Movie movie= getMovieFromListByMovieName(movieName);
-        return "BROADCAST movie " +movie.getName() +" "+ movie.getAvailableAmount()+" "+ movie.getPrice();
+    public String commandRequestBroad(Movie movie){
+        return "BROADCAST movie " + movie.getName() +" "+ movie.getAvailableAmount()+" "+ movie.getPrice();
     }
 
-    public String commandRequestRemoveBroad(String movieName){
-        Movie movie= getMovieFromListByMovieName(movieName);
-        return "BROADCAST movie " +movie.getName() +"removed";
+    public String commandRequestRemoveBroad(Movie movie){
+        return "BROADCAST movie " + movie.getName() +"removed";
     }
     @Override
     public  void updateServiceJson(){

@@ -28,12 +28,12 @@ public class Movie extends  BaseMovie{
         if(bannedCountries != null && !bannedCountries.isEmpty()) {
             String bannedCountries = "";
             for (String country : this.bannedCountries) {
-                bannedCountries = country + " ";
+                bannedCountries = bannedCountries + "\""+ country +"\"" + " ";
             }
             bannedCountries = bannedCountries.substring(0, bannedCountries.length() - 1);
-            return name + " " + availableAmount + " " + price + " " + bannedCountries;
+            return  "\"" +name +"\""+ " "  +availableAmount  + " " + price   +" "+ bannedCountries;
         }
-        else {return name + " " + availableAmount + " " + price;}
+        else {return    "\"" +name +"\""+ " "  +availableAmount  + " " + price ;}
 
         }
 
