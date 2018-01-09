@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TPCMain {
     public static void main(String[] args) {
         try {
-            System.out.println(InetAddress.getLocalHost());
+            System.out.println( "main :"+ InetAddress.getLocalHost());
         }catch (Exception e){}
         MovieSharedData movieSharedData = ReadFromJson();
         Server tpcServer = Server.threadPerClient(
