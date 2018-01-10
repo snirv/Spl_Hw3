@@ -96,9 +96,9 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
         public void signout() {
         String result = sharedData.commandSignOut(connectionId);
         if(result.equals("ACK signout succeeded")){
+            connections.send(connectionId,(T)result);
             shouldTerminated=true;
             connections.disconnect(connectionId);
-            connections.send(connectionId,(T)result);
         }
         else {
             connections.send(connectionId,(T)result);

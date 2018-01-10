@@ -154,8 +154,8 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
     public void broadcast(String msg){
         ConcurrentHashMap<Integer, User>  map = sharedData.getMapOfLoggedInUsersByConnectedIds();
         for (ConcurrentHashMap.Entry<Integer, User> entry : map.entrySet()){
-            UserMovieRental user = (UserMovieRental)entry.getValue();
-            connections.send(user.connectionId,msg);
+            Integer connectionId = entry.getKey();
+            connections.send(connectionId,msg);
         }
     }
 }
