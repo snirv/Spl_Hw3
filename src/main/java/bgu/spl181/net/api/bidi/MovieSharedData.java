@@ -24,7 +24,11 @@ public class MovieSharedData extends SharedData{
     Object lockUpdateServiceJson;
     Object lockUpdateUserJson;
 
-
+    /**
+     * constructor
+     * @param userMovieRentalMap map of user by username
+     * @param movieList a list of movie list
+     */
     public MovieSharedData(ConcurrentHashMap<String,User> userMovieRentalMap ,CopyOnWriteArrayList<Movie> movieList) {
         super(userMovieRentalMap);
         this.movieList = movieList;
@@ -34,6 +38,11 @@ public class MovieSharedData extends SharedData{
 
     }
 
+    /**
+     *
+     * @param connectionId
+     * @return if the connectionId is logged in in the system
+     */
     protected boolean isLoggedIn(Integer connectionId){
         if (mapOfLoggedInUsersByConnectedIds.containsKey(connectionId)) {
             return true;
@@ -41,18 +50,36 @@ public class MovieSharedData extends SharedData{
         else {return false;}
     }
 
+    /**
+     *
+     * @param connectionId
+     * @return if the connection id that related to the username is the admin
+     */
     protected boolean isAdmin(Integer connectionId){
         if(isLoggedIn(connectionId) && ((UserMovieRental)mapOfLoggedInUsersByConnectedIds.get(connectionId)).isAdmin()){
             return true;
         }else {return false;}
     }
 
+
+    /**
+     * execute balance info request
+     * @param connectionId of the usename related to the connection id
+     * @return the message to return to the connection id
+     */
     protected String commandRequestBalanceInfo(Integer connectionId) {
         UserMovieRental user = (UserMovieRental)mapOfLoggedInUsersByConnectedIds.get(connectionId);
         long userBalance = user.getBalance();
         return "ACK balance " + userBalance;
     }
 
+
+    /**
+     * execute balance add request
+     * @param connectionId of the username related to the connection id
+     * @param amount of the copies that will added
+     * @return  the message to return to the connection id
+     */
     protected String commandRequestBalanceAdd(Integer connectionId, String amount) {
         Long amountAslong = Long.decode(amount);
         UserMovieRental user = (UserMovieRental)mapOfLoggedInUsersByConnectedIds.get(connectionId);
@@ -63,13 +90,17 @@ public class MovieSharedData extends SharedData{
         return  "ACK balance " + newBalance + " added " + amount;
     }
 
-
+    /**
+     * execute movie info request
+     * @param movieName the movie that his info will send
+     * @return the message to send to the client
+     */
     protected String commandRequestMovieInfo(String movieName) {
         String ret;
         if(movieName == null){
             ret = "\"";
             for (Movie movie : movieList){
-                ret =ret + movie.getName() + "\" \"";//TODO why it doesnt keep the movie name with qoutation??
+                ret =ret + movie.getName() + "\" \"";
             }
             ret = ret.substring(0, ret.length() -1);
             return "ACK info " + ret ;
@@ -84,6 +115,14 @@ public class MovieSharedData extends SharedData{
             return "ERROR request info failed";
         }
     }
+
+
+    /**
+     * execute movie rent request
+     * @param connectionId of the username related to the connection id
+     * @param movieName to be rent
+     * @return string array that will contain message to client and the broadcast message
+     */
 
     protected String[] commandRequestMovieRent(Integer connectionId ,String movieName) {
         String[] result= new String[2];
@@ -114,6 +153,13 @@ public class MovieSharedData extends SharedData{
         }
     }
 
+    /**
+     * execute movie return request
+     * @param connectionId of the username related to the connection id
+     * @param movieName to be rent
+     * @return string array that will contain message to client and the broadcast message
+     */
+
     protected String[] commandRequestReturnMovie(Integer connectionId, String movieName) {
         String[] result= new String[2];
         synchronized (lock) {
@@ -133,7 +179,15 @@ public class MovieSharedData extends SharedData{
             }
         }
     }
-
+    /**
+     * execute add movie by admin request
+     * @param connectionId of the username related to the connection id
+     * @param movieName to be rent
+     * @param amount the amount of the movie's copy to be added
+     * @param price the price of the movie
+     * @param bannedCountry a list of the banned country -optional
+     * @return string array that will contain message to client and the broadcast message
+     */
 
     protected String[] commandRequestAdminAddMovie(Integer connectionId, String movieName , int amount , int price , List<String> bannedCountry) {
         synchronized (lock) {
@@ -161,6 +215,12 @@ public class MovieSharedData extends SharedData{
         }
     }
 
+    /**
+     * execute remove movie by admin
+     * @param connectionId the client connection id
+     * @param movieName the movie to be remove
+     * @return string array that will contain message to client and the broadcast message
+     */
     protected String[] commandRequestAdminRemmovie(Integer connectionId,String movieName) {
         synchronized (lock) {
             String[] result= new String[2];
@@ -185,6 +245,13 @@ public class MovieSharedData extends SharedData{
         }
     }
 
+    /**
+     * execute change price by admin request
+     * @param connectionId the client connection id
+     * @param movieName the movie to be remove
+     * @param price the new price
+     * @return string array that will contain message to client and the broadcast message
+     */
     protected String[] commandRequestAdminChangePrice(Integer connectionId , String movieName , int price) {
         synchronized (lock) {
             String[] result= new String[2];
@@ -204,6 +271,11 @@ public class MovieSharedData extends SharedData{
         }
     }
 
+    /**
+     * check if the data block is legal according to the protocol
+     * @param dataBlock
+     * @return true is legal or false else
+     */
     @Override
     protected boolean isValidDataBlock(String dataBlock) {
         if (dataBlock== null){return false;}
@@ -212,6 +284,13 @@ public class MovieSharedData extends SharedData{
         else {return false;}
     }
 
+    /**
+     *
+     * @param username the user name to add
+     * @param password the new password
+     * @param connectionId  the client connection id
+     * @param dataBlock the user data block
+     */
     @Override
     protected void addUser(String username , String password, int connectionId, String dataBlock) {
         String[] msg = dataBlock.split("=");
@@ -221,6 +300,12 @@ public class MovieSharedData extends SharedData{
 
     }
 
+
+    /**
+     *
+     * @param movieName
+     * @return return the {@link Movie related to the movie name
+     */
     protected Movie getMovieFromListByMovieName(String movieName) {
         Optional<Movie> movieOptional = movieList.stream().filter((m) -> m.getName().equals(movieName)).findAny();
         if (movieOptional.isPresent()) {
@@ -230,7 +315,9 @@ public class MovieSharedData extends SharedData{
         }
     }
 
-
+    /**
+     * update the json movie file
+     */
     @Override
     public  void updateServiceJson(){
         synchronized (lockUpdateServiceJson) {
@@ -245,6 +332,10 @@ public class MovieSharedData extends SharedData{
             }
         }
     }
+
+    /**
+     * update the user json file
+     */
     @Override
     public  void updateUserJson()  {
         synchronized (lockUpdateUserJson) {
