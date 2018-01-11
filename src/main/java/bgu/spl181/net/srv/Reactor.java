@@ -16,6 +16,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+/**
+ * server that works with non blocking connection pattern
+ * @param <T>
+ */
 public class Reactor<T> implements Server<T> {
 
     private final int port;

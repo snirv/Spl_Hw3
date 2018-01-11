@@ -9,6 +9,12 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * connection handler as learned in the lecture
+ * this blocking connection handler connect as learnd in the class
+ * this class holds the connection between the server and the client
+ * @param <T>
+ */
 public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler<T> {
 
     private final bidiMessagingProtocol<T> protocol;

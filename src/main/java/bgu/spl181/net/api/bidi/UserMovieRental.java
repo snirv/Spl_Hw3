@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * represent the user of movie service rental
+ */
 public class UserMovieRental extends User{
 
     private String country;

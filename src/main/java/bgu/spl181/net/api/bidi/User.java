@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public  class User implements Serializable {
 
+
+    /**
+     * object that holds the abstract user
+     */
     protected String username;
     protected String password;
     protected String type;

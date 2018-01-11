@@ -10,6 +10,10 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+/**
+ * server that works with blocking connection pattern
+ * @param <T>
+ */
 public abstract class BaseServer<T> implements Server<T> {
 
     private final int port;

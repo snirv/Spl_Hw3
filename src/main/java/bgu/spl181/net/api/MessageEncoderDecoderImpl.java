@@ -3,6 +3,10 @@ package bgu.spl181.net.api;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * encode and decode the message got from the buffer
+ * @param <T>
+ */
 public class MessageEncoderDecoderImpl<T> implements MessageEncoderDecoder<T> {
 
     private byte[] bytes = new byte[1 << 10]; //start with 1k

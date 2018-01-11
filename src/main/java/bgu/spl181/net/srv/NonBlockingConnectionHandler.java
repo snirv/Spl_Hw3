@@ -11,6 +11,12 @@ import java.nio.channels.SocketChannel;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * this class holds the connection between the server and the client
+ * this connection handler doesnt wait to the client to react and handle his
+ * command executing by actor thead pool
+ * @param <T>
+ */
 public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
 
     private static final int BUFFER_ALLOCATION_SIZE = 1 << 13; //8k
