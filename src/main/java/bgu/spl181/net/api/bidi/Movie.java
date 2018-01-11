@@ -1,11 +1,12 @@
 package bgu.spl181.net.api.bidi;
 
-import java.io.Serializable;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
+ *
  * object of a movie
  */
 public class Movie extends  BaseMovie{

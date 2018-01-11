@@ -1,10 +1,6 @@
 package bgu.spl181.net.api.bidi;
 
-import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class JsonUsers {

@@ -15,7 +15,7 @@ public class ReactorMain {
     public static void main(String[] args){
        int numOfThreads = 7;
         try {
-            System.out.println( "main :"+ InetAddress.getLocalHost());
+           // System.out.println( "main :"+ InetAddress.getLocalHost());
         }catch (Exception e){}
         MovieSharedData movieSharedData = ReadFromJson();
        Server reactorServer = Server.reactor(

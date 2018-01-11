@@ -85,18 +85,21 @@ public class MovieSharedData extends SharedData{
         }
     }
 
-    protected String commandRequestMovieRent(Integer connectionId ,String movieName) {
+    protected String[] commandRequestMovieRent(Integer connectionId ,String movieName) {
+        String[] result= new String[2];
         UserMovieRental user = (UserMovieRental) mapOfLoggedInUsersByConnectedIds.get(connectionId);
         Movie movie = getMovieFromListByMovieName(movieName);
         synchronized (lock){
         if (movie == null || movie.bannedCountries.contains(user.getCountry()) ||
                 user.isRentingMovie(movieName) ||
                user.getBalance() < movie.getPrice()) {
-            return "ERROR request rent failed";
+            result[0]="ERROR request rent failed";
+            return result;
         }
        // while(!movie.lock.compareAndSet(false,true));
         if (movie.getAvailableAmount() == 0){
-            return "ERROR request rent failed";
+            result[0]="ERROR request rent failed";
+            return result;
         }else {
             user.getMoviesList().add(movie);
             user.setBalance(user.getBalance() - movie.getPrice());
@@ -104,33 +107,41 @@ public class MovieSharedData extends SharedData{
           //  movie.lock.set(false);
             updateUserJson();
             updateServiceJson();
-            return "ACK rent " +"\"" + movieName + "\"" + " success";
+            result[0]="ACK rent " +"\"" + movieName + "\"" + " success";
+            result[1] = "BROADCAST movie " + "\"" + movie.getName() + "\"" +" "+ movie.getAvailableAmount()+" "+ movie.getPrice();
+            return result;
         }
         }
     }
 
-    protected String commandRequestReturnMovie(Integer connectionId, String movieName) {
+    protected String[] commandRequestReturnMovie(Integer connectionId, String movieName) {
+        String[] result= new String[2];
         synchronized (lock) {
             UserMovieRental user = (UserMovieRental) mapOfLoggedInUsersByConnectedIds.get(connectionId);
             Movie movie = getMovieFromListByMovieName(movieName);
             if (movie == null || !user.isRentingMovie(movieName)) {
-                return "ERROR request return failed";
+                result[0]="ERROR request return failed";
+                return result;
             } else {
                 user.getMoviesList().remove(movie);
                 movie.setAvailableAmount(movie.getAvailableAmount() + 1);
                 updateUserJson();
                 updateServiceJson();
-                return "ACK return " + "\"" + movieName + "\""+ " success";
+                result[0]= "ACK return " + "\"" + movieName + "\""+ " success";
+                result[1] = "BROADCAST movie " + "\"" + movie.getName() + "\"" +" "+ movie.getAvailableAmount()+" "+ movie.getPrice();
+                return result;
             }
         }
     }
 
 
-    protected String commandRequestAdminAddMovie(Integer connectionId, String movieName , int amount , int price , List<String> bannedCountry) {
+    protected String[] commandRequestAdminAddMovie(Integer connectionId, String movieName , int amount , int price , List<String> bannedCountry) {
         synchronized (lock) {
+            String[] result= new String[2];
             Movie movie = getMovieFromListByMovieName(movieName);
             if (!isAdmin(connectionId) || amount <= 0 || price <= 0 || movie != null) {
-                return "ERROR request addmovie failed";
+                result[0]="ERROR request addmovie failed";
+                return result ;
             } else {
                 long id = 0;
                 OptionalLong optionalId = movieList.stream()
@@ -143,41 +154,53 @@ public class MovieSharedData extends SharedData{
                 movieList.add(movieToAdd);
                 updateUserJson();
                 updateServiceJson();
-                return "ACK addmovie " + "\"" + movieName + "\""+ " success";
+                result[0]= "ACK addmovie " + "\"" + movieName + "\""+ " success";
+                result[1] = "BROADCAST movie " + "\"" + movieToAdd.getName() + "\"" +" "+ movieToAdd.getAvailableAmount()+" "+ movieToAdd.getPrice();
+                return result;
             }
         }
     }
 
-    protected String commandRequestAdminRemmovie(Integer connectionId,String movieName) {
+    protected String[] commandRequestAdminRemmovie(Integer connectionId,String movieName) {
         synchronized (lock) {
+            String[] result= new String[2];
             Movie movie = getMovieFromListByMovieName(movieName);
             if (movie == null || !isAdmin(connectionId)) {
-                return "ERROR request remmovie failed";
+                result[0]="ERROR request remmovie failed";
+                return result;
             }
            // while (!movie.lock.compareAndSet(false, true)) ;
             if (movie.getAvailableAmount() != movie.getTotalAmount()) {
-                return "ERROR request remmovie failed";
+                result[0]="ERROR request remmovie failed";
+                return result;
             }
             movieList.remove(movie);
           //  movie.lock.set(false);
             updateUserJson();
             updateServiceJson();
-            return "ACK remmovie " + "\"" + movieName + "\""+ " success";
+            result[0]= "ACK remmovie " + "\"" + movieName + "\""+ " success";
+            result[1] = "BROADCAST movie " + "\"" + movie.getName() + "\""+" "+"removed";
+            return result;
+
         }
     }
 
-    protected String commandRequestAdminChangePrice(Integer connectionId , String movieName , int price) {
+    protected String[] commandRequestAdminChangePrice(Integer connectionId , String movieName , int price) {
         synchronized (lock) {
+            String[] result= new String[2];
             Movie movie = getMovieFromListByMovieName(movieName);
             if (movie == null || !isAdmin(connectionId) || price <= 0) {
-                return "ERROR request changeprice failed";
+                result[0]="ERROR request changeprice failed";
+                return result;
             }
            // while (!movie.lock.compareAndSet(false, true)) ;
             movie.setPrice(price);
             //movie.lock.set(false);
             updateUserJson();
             updateServiceJson();
-            return "ACK changeprice " + "\"" + movieName + "\"" + " success";
+            result[0]= "ACK changeprice " + "\"" + movieName + "\"" + " success";
+            result[1] = "BROADCAST movie " + "\"" + movie.getName() + "\"" +" "+ movie.getAvailableAmount()+" "+ movie.getPrice();
+            return result;
         }
     }
 
@@ -185,7 +208,7 @@ public class MovieSharedData extends SharedData{
     protected boolean isValidDataBlock(String dataBlock) {
         if (dataBlock== null){return false;}
         String[] msg = dataBlock.split("=");
-        if(msg.length == 2){return true;}
+        if(msg.length == 2 && msg[0].equals("country")){return true;}
         else {return false;}
     }
 
@@ -207,17 +230,11 @@ public class MovieSharedData extends SharedData{
         }
     }
 
-    public String commandRequestBroad(Movie movie){
-        return "BROADCAST movie " + "\"" + movie.getName() + "\"" +" "+ movie.getAvailableAmount()+" "+ movie.getPrice();
-    }
 
-    public String commandRequestRemoveBroad(Movie movie){
-        return "BROADCAST movie " + "\"" + movie.getName() + "\""+" "+"removed";
-    }
     @Override
     public  void updateServiceJson(){
         synchronized (lockUpdateServiceJson) {
-            try (PrintWriter printer = new PrintWriter("Database/Movies1.json")) {
+            try (PrintWriter printer = new PrintWriter("Database/Movies.json")) {
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 gsonBuilder.setLongSerializationPolicy(LongSerializationPolicy.STRING);
                 Gson writer = gsonBuilder.create();
@@ -231,7 +248,7 @@ public class MovieSharedData extends SharedData{
     @Override
     public  void updateUserJson()  {
         synchronized (lockUpdateUserJson) {
-            try (PrintWriter printer = new PrintWriter("Database/Users1.json")) {
+            try (PrintWriter printer = new PrintWriter("Database/Users.json")) {
                 ArrayList<User> userAsArray = new ArrayList<>();
                 for (Map.Entry<String, User> entry : mapOfRegisteredUsersByUsername.entrySet()) {
                     userAsArray.add(entry.getValue());

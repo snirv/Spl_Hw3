@@ -3,12 +3,12 @@ package bgu.spl181.net.api.bidi;
 import java.io.Serializable;
 
 public  class User implements Serializable {
-    //I am sharon
+
     protected String username;
     protected String password;
     protected String type;
     protected transient boolean isLoggedIn;
-    protected transient int connectionId;//TODO check if necessary
+    protected transient int connectionId;
 
 
 
@@ -17,7 +17,7 @@ public  class User implements Serializable {
         this.password = password;
         this.type = type;
         isLoggedIn = false;
-        this.connectionId =connectionId;
+        this.connectionId = connectionId;
     }
 
     public String getUserName() {

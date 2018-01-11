@@ -21,6 +21,9 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
     @Override
     public void parseringRequest(String args) {
         String result;
+        String[] resultWithBroad;
+        String msgToReturn;
+        String msgToBroadcast;
         MovieSharedData movieSharedData = (MovieSharedData)sharedData;
         String[] msg= args.split(" ");
         if (msg.length==0){
@@ -60,22 +63,22 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
                     break;
                 case  "rent":
                     argument= argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
-                    result=movieSharedData.commandRequestMovieRent(connectionId,argument);
-                    connections.send(connectionId,result);
-                    if (result.substring(0,3).equals("ACK")){
-                        Movie movie = movieSharedData.getMovieFromListByMovieName(argument);
-                        String broadcastResult= movieSharedData.commandRequestBroad(movie);
-                        broadcast(broadcastResult);
+                    resultWithBroad=movieSharedData.commandRequestMovieRent(connectionId,argument);
+                    msgToReturn = resultWithBroad[0];
+                    msgToBroadcast = resultWithBroad[1];
+                    connections.send(connectionId,msgToReturn);
+                    if (msgToReturn.substring(0,3).equals("ACK")){
+                        broadcast(msgToBroadcast);
                     }
                     break;
                 case "return":
                     argument= argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
-                    result= movieSharedData.commandRequestReturnMovie(connectionId,argument);
-                    connections.send(connectionId,result);
-                    if (result.substring(0,3).equals("ACK")){
-                        Movie movie = movieSharedData.getMovieFromListByMovieName(argument);
-                        String broadcastResult= movieSharedData.commandRequestBroad(movie);
-                        broadcast(broadcastResult);
+                    resultWithBroad= movieSharedData.commandRequestReturnMovie(connectionId,argument);
+                    msgToReturn = resultWithBroad[0];
+                    msgToBroadcast = resultWithBroad[1];
+                    connections.send(connectionId,msgToReturn);
+                    if (msgToReturn.substring(0,3).equals("ACK")){
+                        broadcast(msgToBroadcast);
                     }
                     break;
                 case "addmovie":
@@ -91,12 +94,12 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
 
                     }
                     if(args.indexOf(" ")==-1){
-                        result=movieSharedData.commandRequestAdminAddMovie(connectionId,movieName,amount,price,null);
-                        connections.send(connectionId,result);
-                        if (result.substring(0,3).equals("ACK")){
-                            Movie movie = movieSharedData.getMovieFromListByMovieName(movieName);
-                            String broadcastResult= movieSharedData.commandRequestBroad(movie);//TODO
-                            broadcast(broadcastResult);
+                        resultWithBroad=movieSharedData.commandRequestAdminAddMovie(connectionId,movieName,amount,price,null);
+                        msgToReturn = resultWithBroad[0];
+                        msgToBroadcast = resultWithBroad[1];
+                        connections.send(connectionId,msgToReturn);
+                        if (msgToReturn.substring(0,3).equals("ACK")){
+                            broadcast(msgToBroadcast);
                         }
                         break;
                     }
@@ -114,12 +117,12 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
                                 args = "";
                             }
                         }
-                        result=movieSharedData.commandRequestAdminAddMovie(connectionId,movieName,amount,price,banned);
-                        connections.send(connectionId,result);
-                        if (result.substring(0,3).equals("ACK")){
-                            Movie movie = movieSharedData.getMovieFromListByMovieName(movieName);
-                            String broadcastResult= movieSharedData.commandRequestBroad(movie);//TODO
-                            broadcast(broadcastResult);
+                        resultWithBroad=movieSharedData.commandRequestAdminAddMovie(connectionId,movieName,amount,price,banned);
+                        msgToReturn = resultWithBroad[0];
+                        msgToBroadcast = resultWithBroad[1];
+                        connections.send(connectionId,msgToReturn);
+                        if (msgToReturn.substring(0,3).equals("ACK")){
+                            broadcast(msgToBroadcast);
                         }
                         break;
                     }
@@ -127,11 +130,12 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
                 case "remmovie":
                     argument= argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
                     Movie movieToBeRemoved = movieSharedData.getMovieFromListByMovieName(argument);
-                    result = movieSharedData.commandRequestAdminRemmovie(connectionId,argument);
-                    connections.send(connectionId,result);
-                    if (result.substring(0,3).equals("ACK")){
-                        String broadcastResult = movieSharedData.commandRequestRemoveBroad(movieToBeRemoved);//TODO
-                        broadcast(broadcastResult);
+                    resultWithBroad = movieSharedData.commandRequestAdminRemmovie(connectionId,argument);
+                    msgToReturn = resultWithBroad[0];
+                    msgToBroadcast = resultWithBroad[1];
+                    connections.send(connectionId,msgToReturn);
+                    if (msgToReturn.substring(0,3).equals("ACK")){
+                        broadcast(msgToBroadcast);
                     }
                     break;
                 case "changeprice":
@@ -140,11 +144,12 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
                     argument = argument.substring(0,split);
                     String movieNameToSearch = argument.substring(argument.indexOf("\"")+1, argument.lastIndexOf("\""));
                     Movie movie = movieSharedData.getMovieFromListByMovieName(movieNameToSearch);
-                    result = movieSharedData.commandRequestAdminChangePrice(connectionId,movieNameToSearch,pricetobe);
-                    connections.send(connectionId,result);
-                    if (result.substring(0,3).equals("ACK")){
-                        String broadcastResult= movieSharedData.commandRequestBroad(movie);//TODO
-                        broadcast(broadcastResult);
+                    resultWithBroad = movieSharedData.commandRequestAdminChangePrice(connectionId,movieNameToSearch,pricetobe);
+                    msgToReturn = resultWithBroad[0];
+                    msgToBroadcast = resultWithBroad[1];
+                    connections.send(connectionId,msgToReturn);
+                    if (msgToReturn.substring(0,3).equals("ACK")){
+                        broadcast(msgToBroadcast);
                     }
                     break;
                 default:
@@ -162,10 +167,11 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
      * @param msg the message should broadcast
      */
     public void broadcast(String msg){
-        ConcurrentHashMap<Integer, User>  map = sharedData.getMapOfLoggedInUsersByConnectedIds();
-        for (ConcurrentHashMap.Entry<Integer, User> entry : map.entrySet()){
-            Integer connectionId = entry.getKey();
-            connections.send(connectionId,msg);
-        }
+            ConcurrentHashMap<Integer, User> map = sharedData.getMapOfLoggedInUsersByConnectedIds();
+            for (ConcurrentHashMap.Entry<Integer, User> entry : map.entrySet()) {
+                Integer connectionId = entry.getKey();
+                connections.send(connectionId, msg);
+            }
+
     }
 }
