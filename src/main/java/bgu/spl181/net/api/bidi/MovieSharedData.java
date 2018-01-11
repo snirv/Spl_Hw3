@@ -89,7 +89,7 @@ public class MovieSharedData extends SharedData{
         UserMovieRental user = (UserMovieRental) mapOfLoggedInUsersByConnectedIds.get(connectionId);
         Movie movie = getMovieFromListByMovieName(movieName);
         synchronized (lock){
-        if (movie == null || movie.bannedCountries.contains(user.getWithoutQutationCountry()) ||
+        if (movie == null || movie.bannedCountries.contains(user.getCountry()) ||
                 user.isRentingMovie(movieName) ||
                user.getBalance() < movie.getPrice()) {
             return "ERROR request rent failed";
@@ -185,14 +185,14 @@ public class MovieSharedData extends SharedData{
     protected boolean isValidDataBlock(String dataBlock) {
         if (dataBlock== null){return false;}
         String[] msg = dataBlock.split("=");
-        if(msg.length < 2){return false;}
-        else {return true;}
+        if(msg.length == 2){return true;}
+        else {return false;}
     }
 
     @Override
     protected void addUser(String username , String password, int connectionId, String dataBlock) {
         String[] msg = dataBlock.split("=");
-        String country = msg[1];
+        String country = msg[1].substring(1,msg[1].length()-1);
         UserMovieRental userToAdd = new UserMovieRental(username, password, "normal" , connectionId , country, 0 , new LinkedList<>());
         mapOfRegisteredUsersByUsername.put(username,userToAdd);
 

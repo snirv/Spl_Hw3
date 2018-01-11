@@ -100,8 +100,11 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
 
     public void register (String[] msg){
             String result;
+            String userName = msg[1];
+            String password = msg[2];
             if (msg.length == 3) {
-                result = sharedData.commandRegister(msg[1], msg[2], null, connectionId);
+
+                result = sharedData.commandRegister(userName,password, null, connectionId);
                 connections.send(connectionId, (T) result);
             } else if (msg.length > 3) {
                 String datablock="";
@@ -109,7 +112,7 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
                     datablock= datablock + msg[i]+" ";
                 }
                 datablock=datablock.substring(0,datablock.length()-1);
-                result = sharedData.commandRegister(msg[1], msg[2], datablock, connectionId);
+                result = sharedData.commandRegister(userName, password, datablock, connectionId);
                 connections.send(connectionId, (T) result);
             }else {
                 connections.send(connectionId, (T) "ERROR registration failed");
