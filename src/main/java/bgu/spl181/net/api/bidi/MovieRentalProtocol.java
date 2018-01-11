@@ -159,7 +159,7 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
 
     /**
      * broadcast the maessage got to all loggedIn clients
-     * @param msg the message should broadcast  
+     * @param msg the message should broadcast
      */
     public void broadcast(String msg){
         ConcurrentHashMap<Integer, User>  map = sharedData.getMapOfLoggedInUsersByConnectedIds();

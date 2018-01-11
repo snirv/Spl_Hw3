@@ -12,7 +12,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-
+/**
+ * a class that contain thecurrent data of the movie rental system.
+ * this class received a command from the protocol and exectuing them
+ * this class aslo update the json files each time a REQUEST is exectuing
+ */
 public class MovieSharedData extends SharedData{
 
     CopyOnWriteArrayList<Movie> movieList;
