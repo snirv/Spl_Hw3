@@ -1,1 +1,2 @@
+
 {"movies":[{"price":"25","bannedCountries":["united kingdom","italy"],"availableAmount":"1","totalAmount":"2","id":"1","name":"The Godfather"},{"price":"14","bannedCountries":[],"availableAmount":"3","totalAmount":"5","id":"2","name":"The Pursuit Of Happyness"},{"price":"5","bannedCountries":[],"availableAmount":"0","totalAmount":"1","id":"3","name":"The Notebook"}]}

@@ -12,6 +12,11 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
         super(movieSharedData);
     }
 
+    /**
+     * parsering the args into a execution on the {@link MovieSharedData
+     * according to the args received
+     * @param args a string that recevied from the client exculuded "REQUEST"
+     */
 
     @Override
     public void parseringRequest(String args) {
@@ -151,6 +156,11 @@ public class MovieRentalProtocol extends bidiMessagingProtocolImpl {
 
     }
 
+
+    /**
+     * broadcast the maessage got to all loggedIn clients
+     * @param msg the message should broadcast
+     */
     public void broadcast(String msg){
         ConcurrentHashMap<Integer, User>  map = sharedData.getMapOfLoggedInUsersByConnectedIds();
         for (ConcurrentHashMap.Entry<Integer, User> entry : map.entrySet()){
