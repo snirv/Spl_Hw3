@@ -208,11 +208,11 @@ public class MovieSharedData extends SharedData{
     }
 
     public String commandRequestBroad(Movie movie){
-        return "BROADCAST movie " + movie.getName() +" "+ movie.getAvailableAmount()+" "+ movie.getPrice();
+        return "BROADCAST movie " + "\"" + movie.getName() + "\"" +" "+ movie.getAvailableAmount()+" "+ movie.getPrice();
     }
 
     public String commandRequestRemoveBroad(Movie movie){
-        return "BROADCAST movie " + movie.getName() +"removed";
+        return "BROADCAST movie " + "\"" + movie.getName() + "\""+" "+"removed";
     }
     @Override
     public  void updateServiceJson(){
