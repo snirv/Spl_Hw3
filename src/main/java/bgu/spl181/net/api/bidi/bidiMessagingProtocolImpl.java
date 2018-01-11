@@ -3,24 +3,50 @@ package bgu.spl181.net.api.bidi;
 import java.util.ArrayList;
 
 public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProtocol<T> {
+    /**
+     * this class is implimetation of the user text protocol interface
+     * its an abstarct class to keep the design pattern for any service that will implement the system.
+     * this class handels masseges from the client and parsering them to the {@link SharedData  and the data will
+     * return it and answer so this protocol will send it back to the client
+     *
+     * this is abstrct class in order to keep design pattern for serviceing. that mean that the implement service should
+     * extends it and override the  abstract function
+     */
+
 
     protected int connectionId;
     protected Connections<T> connections;
     protected SharedData sharedData;
     protected boolean shouldTerminated;
 
+
+    /**
+     * construct the protocol with share data given and set {@param shouldTerminated to false
+     *
+     * @param sharedData
+     *
+     */
     public bidiMessagingProtocolImpl(SharedData sharedData) {
         this.sharedData = sharedData;
         shouldTerminated=false;
     }
 
-
+    /**
+     * override for start method- set {@param connectionId to be the specific client connectionId
+     *
+     * @param connectionId - specific client connectionId - this client is the client who sent the message to the server
+     * @param connections  represent the connctions class in order to send back to the clinet or broadcast for all the clients
+     */
     @Override
     public void start(int connectionId, Connections<T> connections) {
         this.connectionId = connectionId;
         this.connections = connections;
     }
 
+    /**
+     * process the message given from the client
+     * @param message the message got fro the client
+     */
     @Override
     public void process(T message) {
         if (message instanceof String) {
@@ -60,10 +86,19 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
             return shouldTerminated;
         }
 
-
+    /**
+     * abstract function that will override by the specific service in order to procces REQUEST message
+     * @param args
+     */
         public abstract void parseringRequest(String args);
 
-        public void register (String[] msg){
+    /**
+     * process register command. process the message and deviler for executing by the data
+     * @param msg String Array that represent the original message that splitted into array by " "
+     */
+
+
+    public void register (String[] msg){
             String result;
             if (msg.length == 3) {
                 result = sharedData.commandRegister(msg[1], msg[2], null, connectionId);
@@ -81,8 +116,12 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
             }
         }
 
+    /**
+     * parsering the command LOGIN and deliver to data for executing
+     * @param msg String Array that represent the original message that splitted into array by " "
+     */
 
-        public void  login (String[] msg){
+    public void  login (String[] msg){
             String result;
             if (msg.length == 3) {
                 result = sharedData.commandLogIn(msg[1], msg[2],connectionId);
@@ -92,7 +131,9 @@ public abstract class bidiMessagingProtocolImpl<T> implements bidiMessagingProto
             }
         }
 
-
+    /**
+     * once SIGNOUT command received the protocol deliver for the data to executing. if succeed, disconnect the client from the server
+     */
         public void signout() {
         String result = sharedData.commandSignOut(connectionId);
         if(result.equals("ACK signout succeeded")){
