@@ -7,12 +7,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class SharedData {
-
+    /**
+     * abstract class the represent the the data of the system
+     */
     protected  ConcurrentHashMap<String ,User> mapOfRegisteredUsersByUsername;// map userName to User
     protected  ConcurrentHashMap<Integer,User> mapOfLoggedInUsersByConnectedIds; // map connectionId to username
     private Object LogInLock;
     private Object registerLock;
 
+    /**
+     * default construct the params into null
+     */
     public SharedData() {
         this.mapOfLoggedInUsersByConnectedIds = null;
         this.mapOfRegisteredUsersByUsername = null;
@@ -20,6 +25,10 @@ public abstract class SharedData {
         this.LogInLock = new Object();
     }
 
+    /**
+     * constructor
+     * @param userMap map of user
+     */
     public SharedData(ConcurrentHashMap<String, User> userMap) {
         this.mapOfLoggedInUsersByConnectedIds = new ConcurrentHashMap<>();
         this.mapOfRegisteredUsersByUsername = userMap;
@@ -28,6 +37,14 @@ public abstract class SharedData {
 
     }
 
+    /**
+     * execute register command
+     * @param username the new username
+     * @param password the new password
+     * @param dataBlock the datablock to be add
+     * @param connectionId represent the client
+     * @return the message to be send to the client
+     */
     protected  String commandRegister(String username , String password ,String dataBlock , Integer connectionId){
         synchronized (registerLock) {
         if (mapOfLoggedInUsersByConnectedIds.containsKey(connectionId) ||
@@ -42,6 +59,15 @@ public abstract class SharedData {
         }
 
     }
+
+
+    /**
+     * execute th log in command
+     * @param username the username to be logged in
+     * @param password the user name password
+     * @param connectionId the client connection id
+     * @return  the message to be send to the client
+     */
     protected  String commandLogIn(String username , String password  ,Integer connectionId){
         synchronized (LogInLock) {
             if (!mapOfRegisteredUsersByUsername.containsKey(username) ||
